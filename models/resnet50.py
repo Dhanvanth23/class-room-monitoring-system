@@ -47,7 +47,7 @@ def load_weights(model: Model):
 
     """
 
-    exact_file = "C:/Users/deepa/OneDrive/Desktop/Aishu/CMS/project/models/Face-detection.h5"
+    exact_file = "C:/Users/deepa/OneDrive/Desktop/Aishu/Main Projects/CMS/project/models/Face-detection.h5"
 
     model.load_weights(exact_file)
 

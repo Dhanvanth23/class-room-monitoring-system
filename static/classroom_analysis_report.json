@@ -1,19 +1,19 @@
 {
-    "id": "02981258-1b41-4929-8aa7-4faf62e34a5d",
+    "id": "0c94a91e-569d-4d57-92c8-6198a649a3df",
     "choices": [
         {
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "The picture shows a young woman in a blue top sitting in a room. The infrastructure of the place suggests that it could be a bedroom. The room has a wooden bed with a red headboard, a white wall, and a wooden shelf with some stuffed animals and books. The woman appears to be posing for a picture, as she has a slight smile on her face and is looking directly at the camera. The lighting in the room is soft and ambient, coming from a combination of natural light from",
+                "content": "The picture shows a young girl sitting in front of a computer. The infrastructure of the place is that of a typical Indian home with a red wall and a white wall in the background. The people are working on the computer.",
                 "name": null
             },
-            "finish_reason": "length"
+            "finish_reason": "stop"
         }
     ],
     "usage": {
-        "completion_tokens": 100,
+        "completion_tokens": 46,
         "prompt_tokens": 783,
-        "total_tokens": 883
+        "total_tokens": 829
     }
 }

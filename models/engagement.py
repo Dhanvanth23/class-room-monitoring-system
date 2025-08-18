@@ -3,14 +3,11 @@ import numpy as np
 import os
 
 def find_common_viewpoint(csv_file):
-    # Load the CSV file
     data = pd.read_csv(csv_file)
     
-    # Initialize dictionaries to store median values for each zone
     zones = ["left", "center", "right"]
     zone_median_pose = {}
 
-    # Calculate median head pose for each zone to handle outliers
     for zone in zones:
         zone_data = data[data['zone'] == zone]
         if not zone_data.empty:
@@ -26,22 +23,18 @@ def find_common_viewpoint(csv_file):
     return zone_median_pose
 
 def calculate_engagement(csv_file):
-    # Load the CSV file
     if not os.path.exists(csv_file):
         raise FileNotFoundError(f"The specified file does not exist: {csv_file}")
     
-    # Load the CSV file
     try:
         data = pd.read_csv(csv_file)
     except Exception as e:
         raise ValueError(f"Failed to read the CSV file: {csv_file}. Error: {e}")    
-        # Ensure all relevant columns are numeric
     data['pose.pitch'] = pd.to_numeric(data['pose.pitch'], errors='coerce')
     data['pose.yaw'] = pd.to_numeric(data['pose.yaw'], errors='coerce')
     data['pose.roll'] = pd.to_numeric(data['pose.roll'], errors='coerce')
     data['confidence'] = pd.to_numeric(data['confidence'], errors='coerce')
     
-    # Define emotion weights based on classroom engagement
     emotion_weights = {
         "neutral": 20,    # Baseline - focused
         "happy": -5,      # Positive engagement
@@ -53,10 +46,8 @@ def calculate_engagement(csv_file):
         "NaN": -100
     }
     
-    # Get the zone-wise common viewpoints (pitch, yaw, roll)
     zone_median_pose = find_common_viewpoint(csv_file)
     
-    # Initialize list to store the engagement scores
     engagement_scores = []
     
     for _, row in data.iterrows():
@@ -64,40 +55,31 @@ def calculate_engagement(csv_file):
         zone = row["zone"]
         emotion = row["emotion"]
         confidence = row["confidence"]
-        emotion_weight = emotion_weights.get(emotion, 0) * confidence  # Weight adjusted by confidence
+        emotion_weight = emotion_weights.get(emotion, 0) * confidence  
         
-        # Get the common viewpoint for the student's zone
         zone_pose = zone_median_pose.get(zone, {"median_pitch": 0, "median_yaw": 0})
         
-        # Calculate deviation from the zone viewpoint
         pitch_deviation = abs(row["pose.pitch"] - zone_pose["median_pitch"])
         yaw_deviation = abs(row["pose.yaw"] - zone_pose["median_yaw"])
         
-        # Boundaries for extreme deviations
         if yaw_deviation > 90:
             yaw_deviation = 100  # Assign extreme penalty for large yaw deviation
         if pitch_deviation > 100:
             pitch_deviation = 100  # Assign extreme penalty for large pitch deviation
         
-        # Normalize the head pose deviations (dynamically calculated max deviation)
         max_deviation = 45
         yaw_score = max(0, 100 - (yaw_deviation / max_deviation) * 100)
         pitch_score = max(0, 100 - (pitch_deviation / max_deviation) * 100)
         
-        # Aggregate head pose scores with yaw as the priority
         head_pose_score = (yaw_score * 0.7) + (pitch_score * 0.3)
         
-        # Normalize emotion score to 0-100
         normalized_emotion = (emotion_weight + 50)
         normalized_emotion = np.clip(normalized_emotion, 0, 100)
         
-        # Combine the normalized scores for final engagement score
         total_engagement_score = (head_pose_score * 0.8) + (normalized_emotion * 0.2)
         
-        # Final normalization of engagement score between 0 and 100
         total_engagement_score = np.clip(total_engagement_score, 0, 100)
         
-        # Store the engagement score and relevant data
         engagement_scores.append({
             "face_id": face_id,
             "zone": zone,
@@ -113,12 +95,10 @@ def calculate_engagement(csv_file):
             "engagement_score": total_engagement_score
         })
     
-    # Convert engagement scores into a DataFrame
     engagement_df = pd.DataFrame(engagement_scores)
     
     # Calculate overall class engagement score (average of individual engagement scores)
     overall_engagement_score = engagement_df["engagement_score"].mean()
 
-    # Return both individual scores and overall class engagement score
     return engagement_df, overall_engagement_score
 

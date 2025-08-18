@@ -6,10 +6,8 @@ from .processing import postprocess
 
 from .utils import package_utils
 
-# this has to be set before importing tf
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
-# pylint: disable=wrong-import-position
 import numpy as np
 import tensorflow as tf
 from . import resnet50
@@ -28,17 +26,12 @@ from . import Analyse_emotion
 package_utils.validate_for_keras3()
 
 
-# pylint: disable=global-variable-undefined, no-name-in-module, unused-import, too-many-locals, redefined-outer-name, too-many-statements, too-many-arguments
-
-# ---------------------------
-
 # configurations
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 # Limit the amount of reserved VRAM so that other scripts can be run in the same GPU as well
 os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
-# ---------------------------
 
 
 def build_model() -> Any:
@@ -282,8 +275,6 @@ def extract_faces(
             left_eye = landmarks["left_eye"]
             right_eye = landmarks["right_eye"]
             nose = landmarks["nose"]
-            # mouth_right = landmarks["mouth_right"]
-            # mouth_left = landmarks["mouth_left"]
 
             # notice that left eye of one is seen on the right from your perspective
             aligned_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
