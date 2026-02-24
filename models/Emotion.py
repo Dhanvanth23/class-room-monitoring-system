@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 import traceback
 
 # project dependencies
@@ -26,8 +27,7 @@ else:
         Dropout,
     )
 
-import traceback
-traceback.print_exc()
+
 
 
 # Labels for the emotions that can be detected by the model.
@@ -35,7 +35,7 @@ labels = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
 # pylint: disable=line-too-long, disable=too-few-public-methods
 
-weight_file = "C:/Users/mourish/Desktop/Projects/CMS_NEC/models/FER-CNN.h5"
+weight_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "FER-CNN.h5")
 
 
 def load_model_weights(model: Sequential, weight_file: str) -> Sequential:

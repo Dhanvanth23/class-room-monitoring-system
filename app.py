@@ -80,29 +80,7 @@ def shutdown_session(exception=None):
     if engine:
         engine.dispose()
 
-# Modify your monitor_sessions function to handle connection cleanup
-def monitor_sessions():
-    def run_monitor():
-        while True:
-            try:
-                with session_scope() as session:
-                    current_time = datetime.now().strftime("%H:%M")
-                    session_to_start = session.query(Session).filter(
-                        func.strftime("%H:%M", Session.start_time) == current_time
-                    ).first()
-                    
-                    if session_to_start:
-                        start_session(session_to_start.id)
-                        break
-            except Exception as e:
-                print(f"Monitor session error: {e}")
-                time.sleep(5)  # Wait before retrying
-            finally:
-                time.sleep(60)  # Check every minute
 
-    session_thread = threading.Thread(target=run_monitor)
-    session_thread.daemon = True
-    session_thread.start()
 
 # Utility Functions
 def start_session_if_scheduled():
@@ -121,11 +99,6 @@ def monitor_sessions():
     session_thread = threading.Thread(target=start_session_if_scheduled)
     session_thread.daemon = True
     session_thread.start()
-
-@app.before_request
-def start_monitoring_sessions():
-    print("Monitoring the Sessions...")
-    monitor_sessions() 
 
 def load_engagement_scores():
     """Load engagement scores from file."""
@@ -337,9 +310,7 @@ def logout():
     session.pop("user", None)
     return redirect(url_for("login"))
 
-@app.route('/')
-def home():
-    return render_template('login.html')
+
 
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule_session():
@@ -482,11 +453,10 @@ def attendance_report():
 def examManagement():
     return render_template("examManagement.html")
 
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
+
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+    monitor_sessions()
     socketio.run(app, debug=True)

@@ -47,7 +47,7 @@ def load_weights(model: Model):
 
     """
 
-    exact_file = "C:/Users/mourish/Desktop/Projects/CMS_NEC/models/Face-detection.h5"
+    exact_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Face-detection.h5")
 
     model.load_weights(exact_file)
 
