@@ -1,0 +1,163 @@
+/* ==============================================
+   TRAINER PAGE — Matches Home Blue Education Theme
+   ============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --tr-blue-50:  #eff6ff;
+    --tr-blue-100: #dbeafe;
+    --tr-blue-200: #bfdbfe;
+    --tr-blue-400: #60a5fa;
+    --tr-blue-500: #3b82f6;
+    --tr-blue-600: #2563eb;
+    --tr-blue-700: #1d4ed8;
+    --tr-blue-800: #1e40af;
+    --tr-bg:       #f0f4f8;
+    --tr-card:     #ffffff;
+    --tr-text:     #1e293b;
+    --tr-muted:    #64748b;
+    --tr-light:    #94a3b8;
+    --tr-radius:   16px;
+    --tr-radius-sm:10px;
+    --tr-shadow:   0 1px 3px rgba(30,58,95,.06), 0 4px 14px rgba(30,58,95,.08);
+    --tr-shadow-h: 0 4px 12px rgba(30,58,95,.10), 0 8px 24px rgba(30,58,95,.12);
+    --tr-ease:     all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ---------- Page ---------- */
+.trainer-page {
+    font-family: 'Inter','Segoe UI',sans-serif;
+    padding: 1.75rem 2rem;
+    min-height: calc(100vh - 70px);
+    background:
+        radial-gradient(ellipse at 85% 15%, rgba(59,130,246,.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 10% 90%, rgba(59,130,246,.06) 0%, transparent 50%),
+        linear-gradient(165deg,#eef4fb 0%,#f0f4f8 40%,#f5f7fa 100%);
+    background-color: var(--tr-bg);
+    position: relative;
+}
+
+/* ---------- Banner ---------- */
+.trainer-banner {
+    background: linear-gradient(135deg, var(--tr-blue-600) 0%, var(--tr-blue-400) 100%);
+    border-radius: var(--tr-radius);
+    padding: 1.75rem 2.5rem;
+    color: #fff;
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+}
+.trainer-banner::before {
+    content:''; position:absolute; top:-40%; right:-8%;
+    width:280px; height:280px;
+    background:rgba(255,255,255,.08); border-radius:50%; pointer-events:none;
+}
+.trainer-banner h1 { font-size:1.5rem; font-weight:700; margin:0 0 .3rem; letter-spacing:-.02em; }
+.trainer-banner p  { font-size:.9rem; opacity:.85; margin:0; }
+
+/* ---------- Two-column layout ---------- */
+.trainer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.25rem;
+}
+@media (max-width:860px){ .trainer-grid{ grid-template-columns:1fr; } }
+
+/* ---------- Card ---------- */
+.tr-card {
+    background: var(--tr-card);
+    border-radius: var(--tr-radius);
+    box-shadow: var(--tr-shadow);
+    padding: 1.5rem;
+    transition: var(--tr-ease);
+}
+.tr-card:hover { box-shadow: var(--tr-shadow-h); }
+
+.tr-card .card-header {
+    display:flex; align-items:center; gap:.5rem;
+    margin-bottom:1.25rem;
+}
+.tr-card .card-header h2 {
+    font-size:1.05rem; font-weight:600;
+    color:var(--tr-text); margin:0; display:flex; align-items:center; gap:.5rem;
+}
+.tr-card .card-header h2 i { color:var(--tr-blue-500); font-size:.95rem; }
+
+/* ---------- Form ---------- */
+.tr-form .field { margin-bottom:1.1rem; }
+.tr-form label {
+    display:block; font-size:.8rem; font-weight:600;
+    color:var(--tr-muted); margin-bottom:.35rem; letter-spacing:.02em;
+}
+.tr-form input {
+    width:100%; box-sizing:border-box;
+    padding:.6rem .85rem;
+    border:1.5px solid var(--tr-blue-200);
+    border-radius: var(--tr-radius-sm);
+    font-size:.9rem; color:var(--tr-text);
+    background:var(--tr-blue-50);
+    transition:var(--tr-ease); outline:none;
+}
+.tr-form input:focus {
+    border-color:var(--tr-blue-500);
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.tr-form .btn-submit {
+    width:100%; padding:.7rem;
+    background:linear-gradient(135deg,var(--tr-blue-600),var(--tr-blue-400));
+    color:#fff; border:none; border-radius:var(--tr-radius-sm);
+    font-size:.9rem; font-weight:600; cursor:pointer;
+    transition:var(--tr-ease); letter-spacing:.02em;
+}
+.tr-form .btn-submit:hover { transform:translateY(-2px); box-shadow:var(--tr-shadow-h); }
+
+/* ---------- Trainer list ---------- */
+.trainer-list { display:flex; flex-direction:column; gap:.75rem; }
+
+.trainer-row {
+    display:flex; align-items:center; gap:.85rem;
+    padding:.9rem 1rem;
+    background:var(--tr-blue-50);
+    border-radius:var(--tr-radius-sm);
+    border:1px solid transparent;
+    transition:var(--tr-ease);
+}
+.trainer-row:hover { border-color:var(--tr-blue-200); background:var(--tr-blue-100); }
+
+.tr-avatar {
+    width:42px; height:42px; min-width:42px; border-radius:50%;
+    background:linear-gradient(135deg,var(--tr-blue-400),var(--tr-blue-600));
+    color:#fff; font-weight:700; font-size:.95rem;
+    display:flex; align-items:center; justify-content:center;
+    text-transform:uppercase; flex-shrink:0;
+}
+
+.tr-info { flex:1; min-width:0; }
+.tr-info .tr-name  { font-size:.88rem; font-weight:600; color:var(--tr-text); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tr-info .tr-email { font-size:.75rem; color:var(--tr-light); margin:.1rem 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tr-info .tr-id    { font-size:.72rem; color:var(--tr-muted); font-weight:500; }
+
+.tr-actions { display:flex; gap:.5rem; flex-shrink:0; }
+.tr-actions a, .tr-actions button {
+    padding:.35rem .7rem; border-radius:8px;
+    font-size:.75rem; font-weight:600; cursor:pointer;
+    border:none; text-decoration:none; transition:var(--tr-ease);
+    display:inline-flex; align-items:center; gap:.3rem;
+}
+.btn-edit   { background:var(--tr-blue-100); color:var(--tr-blue-700); }
+.btn-edit:hover   { background:var(--tr-blue-200); }
+.btn-delete { background:#fee2e2; color:#dc2626; }
+.btn-delete:hover { background:#fca5a5; }
+
+/* ---------- Empty state ---------- */
+.tr-empty { text-align:center; padding:2rem 1rem; color:var(--tr-light); }
+.tr-empty i { font-size:2rem; color:var(--tr-blue-200); display:block; margin-bottom:.5rem; }
+.tr-empty p { font-size:.85rem; margin:0; }
+
+/* ---------- Flash messages ---------- */
+.tr-flash { display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
+    border-radius:var(--tr-radius-sm); margin-bottom:1rem; font-size:.85rem; font-weight:500; }
+.tr-flash.success { background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7; }
+.tr-flash.error   { background:#fef2f2; color:#991b1b; border:1px solid #fca5a5; }

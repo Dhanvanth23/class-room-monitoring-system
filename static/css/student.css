@@ -1,0 +1,324 @@
+/* =============================================
+   STUDENT PAGE — Blue Education Theme (home.css replica)
+   ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --st-blue-50: #eff6ff;
+    --st-blue-100: #dbeafe;
+    --st-blue-200: #bfdbfe;
+    --st-blue-400: #60a5fa;
+    --st-blue-500: #3b82f6;
+    --st-blue-600: #2563eb;
+    --st-blue-700: #1d4ed8;
+    --st-blue-800: #1e40af;
+    --st-bg: #f0f4f8;
+    --st-card: #ffffff;
+    --st-text: #1e293b;
+    --st-muted: #64748b;
+    --st-light: #94a3b8;
+    --st-radius: 16px;
+    --st-radius-sm: 10px;
+    --st-shadow: 0 1px 3px rgba(30, 58, 95, .06), 0 4px 14px rgba(30, 58, 95, .08);
+    --st-shadow-h: 0 4px 12px rgba(30, 58, 95, .10), 0 8px 24px rgba(30, 58, 95, .12);
+    --st-ease: all .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Page */
+.student-page {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    padding: 1.75rem 2rem;
+    min-height: calc(100vh - 70px);
+    background:
+        radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, .08) 0%, transparent 55%),
+        radial-gradient(ellipse at 10% 90%, rgba(59, 130, 246, .06) 0%, transparent 50%),
+        linear-gradient(165deg, #eef4fb 0%, #f0f4f8 40%, #f5f7fa 100%);
+    background-color: var(--st-bg);
+    position: relative;
+}
+
+/* Banner */
+.student-banner {
+    background: linear-gradient(135deg, var(--st-blue-600) 0%, var(--st-blue-400) 100%);
+    border-radius: var(--st-radius);
+    padding: 1.75rem 2.5rem;
+    color: #fff;
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.student-banner::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -8%;
+    width: 280px;
+    height: 280px;
+    background: rgba(255, 255, 255, .08);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.student-banner h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 .3rem;
+    letter-spacing: -.02em;
+}
+
+.student-banner p {
+    font-size: .9rem;
+    opacity: .85;
+    margin: 0;
+}
+
+/* Two-column layout */
+.student-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.25rem;
+}
+
+@media(max-width:860px) {
+    .student-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card */
+.st-card {
+    background: var(--st-card);
+    border-radius: var(--st-radius);
+    box-shadow: var(--st-shadow);
+    padding: 1.5rem;
+    transition: var(--st-ease);
+}
+
+.st-card:hover {
+    box-shadow: var(--st-shadow-h);
+}
+
+.st-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+}
+
+.st-card .card-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--st-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.st-card .card-header h2 i {
+    color: var(--st-blue-500);
+    font-size: .95rem;
+}
+
+/* Form */
+.st-form .field {
+    margin-bottom: 1.1rem;
+}
+
+.st-form label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--st-muted);
+    margin-bottom: .35rem;
+    letter-spacing: .02em;
+}
+
+.st-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .6rem .85rem;
+    border: 1.5px solid var(--st-blue-200);
+    border-radius: var(--st-radius-sm);
+    font-size: .9rem;
+    color: var(--st-text);
+    background: var(--st-blue-50);
+    transition: var(--st-ease);
+    outline: none;
+}
+
+.st-form input:focus {
+    border-color: var(--st-blue-500);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+}
+
+.st-form .btn-submit {
+    width: 100%;
+    padding: .7rem;
+    background: linear-gradient(135deg, var(--st-blue-600), var(--st-blue-400));
+    color: #fff;
+    border: none;
+    border-radius: var(--st-radius-sm);
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--st-ease);
+    letter-spacing: .02em;
+}
+
+.st-form .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--st-shadow-h);
+}
+
+/* Student list */
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.student-row {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .9rem 1rem;
+    background: var(--st-blue-50);
+    border-radius: var(--st-radius-sm);
+    border: 1px solid transparent;
+    transition: var(--st-ease);
+}
+
+.student-row:hover {
+    border-color: var(--st-blue-200);
+    background: var(--st-blue-100);
+}
+
+.st-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--st-blue-400), var(--st-blue-600));
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.st-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.st-info .st-name {
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--st-text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.st-info .st-email {
+    font-size: .75rem;
+    color: var(--st-light);
+    margin: .1rem 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.st-info .st-roll {
+    font-size: .72rem;
+    color: var(--st-muted);
+    font-weight: 500;
+}
+
+.st-actions {
+    display: flex;
+    gap: .5rem;
+    flex-shrink: 0;
+}
+
+.st-actions a,
+.st-actions button {
+    padding: .35rem .7rem;
+    border-radius: 8px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: var(--st-ease);
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+.btn-edit {
+    background: var(--st-blue-100);
+    color: var(--st-blue-700);
+}
+
+.btn-edit:hover {
+    background: var(--st-blue-200);
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #fca5a5;
+}
+
+/* Empty / Flash */
+.st-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--st-light);
+}
+
+.st-empty i {
+    font-size: 2rem;
+    color: var(--st-blue-200);
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.st-empty p {
+    font-size: .85rem;
+    margin: 0;
+}
+
+.st-flash {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1rem;
+    border-radius: var(--st-radius-sm);
+    margin-bottom: 1rem;
+    font-size: .85rem;
+    font-weight: 500;
+}
+
+.st-flash.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.st-flash.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
