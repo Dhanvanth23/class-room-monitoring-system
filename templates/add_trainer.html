@@ -2,20 +2,65 @@
 
 {% block title %}Add Trainer{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/trainer.css') }}">
+{% endblock %}
+
 {% block content %}
-   <section>
-       <h2>Add Trainer</h2>
-       <form action="{{ url_for('add_trainer') }}" method="POST">
-           <label for="name">Trainer Name:</label>
-           <input type="text" id="name" name="name" required><br><br>
-           
-           <label for="email">Trainer Email:</label>
-           <input type="email" id="email" name="email" required><br><br>
-           
-           <label for="expertise">Trainer Expertise:</label>
-           <input type="text" id="expertise" name="expertise" required><br><br>
-           
-           <button type="submit">Add Trainer</button>
-       </form>
-   </section>
+<div class="trainer-page">
+    <div class="trainer-banner">
+        <h1><i class="fas fa-user-plus"></i> Add Trainer</h1>
+        <p>Register a new trainer to the system</p>
+    </div>
+
+    <div class="trainer-grid">
+        <div class="tr-card">
+            <div class="card-header">
+                <h2><i class="fas fa-id-card"></i> Trainer Details</h2>
+            </div>
+            <form class="tr-form" action="{{ url_for('add_trainer') }}" method="POST">
+                <div class="field">
+                    <label for="trainer_id">Trainer ID</label>
+                    <input type="text" id="trainer_id" name="trainer_id" placeholder="e.g. TR-001" required>
+                </div>
+                <div class="field">
+                    <label for="name">Trainer Name</label>
+                    <input type="text" id="name" name="name" placeholder="Full name" required>
+                </div>
+                <div class="field">
+                    <label for="email">Trainer Email</label>
+                    <input type="email" id="email" name="email" placeholder="email@example.com" required>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-plus-circle"></i> Add Trainer
+                </button>
+            </form>
+        </div>
+
+        <div class="tr-card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Registered Trainers</h2>
+            </div>
+            <div class="trainer-list">
+                {% if trainers %}
+                {% for t in trainers %}
+                <div class="trainer-row">
+                    <div class="tr-avatar">{{ t.name[0] }}</div>
+                    <div class="tr-info">
+                        <p class="tr-name">{{ t.name }}</p>
+                        <p class="tr-email">{{ t.email }}</p>
+                        <span class="tr-id">ID: {{ t.trainer_id }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="tr-empty">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No trainers registered yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

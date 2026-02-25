@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalvi Koodam.ai - Welcome</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', Arial, sans-serif;
+            background-color: #0D1321;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: row;
+            overflow: auto;
+        }
+
+        .intro-container {
+            width: 50%;
+            padding: 40px;
+            max-width: 500px;
+        }
+
+        .intro-container h1 {
+            font-size: 2.6em;
+            margin-bottom: 10px;
+            text-align: left;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .intro-container h2 {
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            text-align: left;
+            color: #C5D86D;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 40px;
+            padding: 0;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 16px;
+            font-size: 1.15em;
+            color: #c8d0e0;
+            line-height: 1.5;
+        }
+
+        .features-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 10px;
+            height: 10px;
+            background-color: #C5D86D;
+            border-radius: 50%;
+        }
+
+        .next-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 48px;
+            font-size: 1.25em;
+            font-weight: 600;
+            background-color: #4A7CF3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+        }
+
+        .next-btn:hover {
+            background-color: #3B6DE0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 243, 0.4);
+        }
+
+        .next-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .next-btn:hover svg {
+            transform: translateX(4px);
+        }
+
+        .image-container {
+            width: 50%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .intro-container {
+                width: 90%;
+                margin-bottom: 20px;
+                padding: 20px;
+            }
+
+            .image-container {
+                width: 90%;
+            }
+
+            .next-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        ::selection {
+            background-color: #C5D86D;
+            color: #0D1321;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="intro-container">
+        <h1>Kalvi Koodam.ai</h1>
+        <h2>Your Journey to Smarter Classrooms Begins Here!</h2>
+
+        <ul class="features-list">
+            <li>Access real-time AI-powered classroom engagement monitoring and analytics</li>
+            <li>Manage attendance, sessions, and trainer performance effortlessly</li>
+            <li>Generate comprehensive engagement reports with actionable insights</li>
+        </ul>
+
+        <a href="{{ url_for('login') }}" class="next-btn">
+            Next
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
+            </svg>
+        </a>
+    </div>
+
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='jpg intro.png') }}" alt="Kalvi Koodam.ai - Smart Classroom">
+    </div>
+</body>
+
+</html>

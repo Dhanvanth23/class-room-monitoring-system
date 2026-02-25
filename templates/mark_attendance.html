@@ -3,39 +3,318 @@
 {% block title %}Mark Attendance{% endblock %}
 
 {% block content %}
-<section>
-    <h1>Mark Attendance</h1>
-    <form method="POST" action="/mark-attendance" class="attendance-form">
-        
-        <!-- Session Selection -->
-        <label for="session_id">Select Session:</label>
-        <select name="session_id" id="session_id" required>
-            {% for session in sessions %}
-                <option value="{{ session.id }}">
-                    {{ session.name }} - {{ session.date }}
-                </option>
-            {% endfor %}
-        </select>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance.css') }}" />
 
-        <!-- Student Selection (Table layout) -->
-        <label>Select Students:</label>
-        <div class="checkbox-table">
-            <div class="checkbox-row">
-                <div class="checkbox-cell-head">Student Name</div>
-                <div class="checkbox-cell-head">Present</div>
-            </div>
-            {% for student in students %}
-                <div class="checkbox-row">
-                    <div class="checkbox-cell">{{ student.name }}</div>
-                    <div class="checkbox-cell">
-                        <input type="checkbox" name="attendance" value="{{ student.id }}">
-                    </div>
-                </div>
-            {% endfor %}
+<div class="attendance-page">
+    <!-- Header with gradient -->
+    <div class="attendance-header">
+        <div class="attendance-header-left">
+            <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
+            <p>Mark and track student attendance for each session</p>
         </div>
+        <div class="attendance-badges">
+            <div class="badge-card">
+                <span class="badge-count" id="badge-present">0</span>
+                <span class="badge-label">Present</span>
+            </div>
+            <div class="badge-card">
+                <span class="badge-count" id="badge-absent">0</span>
+                <span class="badge-label">Absent</span>
+            </div>
+            <div class="badge-card">
+                <span class="badge-count" id="badge-late">0</span>
+                <span class="badge-label">Late</span>
+            </div>
+        </div>
+    </div>
 
-        <!-- Submit Button -->
-        <button type="submit">Submit Attendance</button>
-    </form>
-</section>
+    <!-- Controls Bar -->
+    <div class="attendance-controls">
+        <div class="control-group">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="date" id="attendance-date" placeholder="dd-mm-yyyy">
+        </div>
+        <div class="control-group">
+            <select id="session-select">
+                <option value="">Select Session</option>
+                {% for session in sessions %}
+                <option value="{{ session.id }}">{{ session.name }} ({{ session.date }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="control-group search-group">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-student" placeholder="Search student...">
+        </div>
+        <button class="btn-mark-all" id="btn-mark-all">Mark All Present</button>
+    </div>
+
+    <!-- Student Table -->
+    {% if students %}
+    <div class="attendance-table-wrapper">
+        <table class="attendance-table" id="attendance-table">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr class="student-row" data-student-id="{{ student.id }}" data-student-name="{{ student.name|lower }}">
+                    <td class="roll-no">{{ student.Rollno }}</td>
+                    <td>
+                        <div class="student-name-cell">
+                            <div class="student-avatar">{{ student.name[0]|upper }}</div>
+                            <span class="student-name">{{ student.name }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-unmarked" id="status-{{ student.id }}">
+                            <i class="fas fa-minus-circle"></i> Unmarked
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons-group">
+                            <button class="action-btn" title="Present" data-action="present">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Absent" data-action="absent">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="action-btn" title="Late" data-action="late">
+                                <i class="fas fa-clock"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr class="no-results-row">
+                    <td colspan="4">No students match your search.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="attendance-table-wrapper">
+        <div class="empty-state">
+            <i class="fas fa-user-graduate"></i>
+            <p>No students found. Add students first from the Manage Students page.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Submit Button -->
+    <div class="submit-row">
+        <button class="btn-submit-attendance" id="btn-submit">Submit Attendance</button>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // Attendance state: { studentId: 'present' | 'absent' | 'late' }
+    const attendanceState = {};
+
+    function setStatus(studentId, status, btnElement) {
+        attendanceState[studentId] = status;
+
+        // Update action buttons in this row
+        const row = btnElement.closest('tr');
+        const buttons = row.querySelectorAll('.action-btn');
+        buttons.forEach(function (btn) {
+            btn.classList.remove('active-present', 'active-absent', 'active-late');
+        });
+
+        if (status === 'present') {
+            buttons[0].classList.add('active-present');
+        } else if (status === 'absent') {
+            buttons[1].classList.add('active-absent');
+        } else if (status === 'late') {
+            buttons[2].classList.add('active-late');
+        }
+
+        // Update status badge
+        var badge = document.getElementById('status-' + studentId);
+        badge.className = 'status-badge';
+        if (status === 'present') {
+            badge.className += ' status-present';
+            badge.innerHTML = '<i class="fas fa-check-circle"></i> Present';
+        } else if (status === 'absent') {
+            badge.className += ' status-absent';
+            badge.innerHTML = '<i class="fas fa-times-circle"></i> Absent';
+        } else if (status === 'late') {
+            badge.className += ' status-late';
+            badge.innerHTML = '<i class="fas fa-clock"></i> Late';
+        }
+
+        updateBadgeCounts();
+    }
+
+    function markAllPresent() {
+        var rows = document.querySelectorAll('.student-row');
+        rows.forEach(function (row) {
+            if (row.style.display === 'none') return;
+            var studentId = row.dataset.studentId;
+            var presentBtn = row.querySelectorAll('.action-btn')[0];
+            setStatus(parseInt(studentId), 'present', presentBtn);
+        });
+    }
+
+    function updateBadgeCounts() {
+        var present = 0, absent = 0, late = 0;
+        Object.values(attendanceState).forEach(function (status) {
+            if (status === 'present') present++;
+            else if (status === 'absent') absent++;
+            else if (status === 'late') late++;
+        });
+        document.getElementById('badge-present').textContent = present;
+        document.getElementById('badge-absent').textContent = absent;
+        document.getElementById('badge-late').textContent = late;
+    }
+
+    function showToast(message, type) {
+        var toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast toast-' + type + ' show';
+        setTimeout(function () {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    async function submitAttendance() {
+        var sessionId = document.getElementById('session-select').value;
+        if (!sessionId) {
+            showToast('Please select a session first!', 'error');
+            return;
+        }
+
+        var records = [];
+        var entries = Object.entries(attendanceState);
+        for (var i = 0; i < entries.length; i++) {
+            records.push({
+                student_id: parseInt(entries[i][0]),
+                status: entries[i][1]
+            });
+        }
+
+        if (records.length === 0) {
+            showToast('Please mark at least one student!', 'error');
+            return;
+        }
+
+        var btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            var response = await fetch('/api/mark-attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: parseInt(sessionId),
+                    attendance: records
+                })
+            });
+            var data = await response.json();
+
+            if (data.success) {
+                showToast('Attendance saved successfully!', 'success');
+            } else {
+                showToast(data.error || 'Failed to save attendance', 'error');
+            }
+        } catch (err) {
+            showToast('Network error. Please try again.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Submit Attendance';
+        }
+    }
+
+    // Event delegation for action buttons (avoids Jinja2 in inline onclick)
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.action-btn[data-action]');
+        if (!btn) return;
+        var row = btn.closest('.student-row');
+        if (!row) return;
+        var studentId = parseInt(row.dataset.studentId);
+        var action = btn.dataset.action;
+        setStatus(studentId, action, btn);
+    });
+
+    // Mark All Present button
+    var markAllBtn = document.getElementById('btn-mark-all');
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', markAllPresent);
+    }
+
+    // Submit button
+    var submitBtnEl = document.getElementById('btn-submit');
+    if (submitBtnEl) {
+        submitBtnEl.addEventListener('click', submitAttendance);
+    }
+
+    // Search filter
+    document.getElementById('search-student').addEventListener('input', function () {
+        var query = this.value.toLowerCase().trim();
+        var rows = document.querySelectorAll('.student-row');
+        var visibleCount = 0;
+        rows.forEach(function (row) {
+            var name = row.dataset.studentName;
+            if (name.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        var noResults = document.querySelector('.no-results-row');
+        if (noResults) {
+            noResults.style.display = visibleCount === 0 ? '' : 'none';
+        }
+    });
+
+    // Load existing attendance when session changes
+    document.getElementById('session-select').addEventListener('change', async function () {
+        var sessionId = this.value;
+        if (!sessionId) return;
+
+        try {
+            var response = await fetch('/api/get-attendance/' + sessionId);
+            var data = await response.json();
+
+            if (data.success && data.attendance) {
+                // Reset all first
+                var rows = document.querySelectorAll('.student-row');
+                rows.forEach(function (row) {
+                    var sid = row.dataset.studentId;
+                    var buttons = row.querySelectorAll('.action-btn');
+                    buttons.forEach(function (btn) { btn.classList.remove('active-present', 'active-absent', 'active-late'); });
+                    var badge = document.getElementById('status-' + sid);
+                    badge.className = 'status-badge status-unmarked';
+                    badge.innerHTML = '<i class="fas fa-minus-circle"></i> Unmarked';
+                    delete attendanceState[sid];
+                });
+
+                // Apply saved attendance
+                var attKeys = Object.keys(data.attendance);
+                for (var j = 0; j < attKeys.length; j++) {
+                    var studentIdStr = attKeys[j];
+                    var status = data.attendance[studentIdStr];
+                    var row = document.querySelector('tr[data-student-id="' + studentIdStr + '"]');
+                    if (row) {
+                        var buttons = row.querySelectorAll('.action-btn');
+                        var btnIndex = status === 'present' ? 0 : status === 'absent' ? 1 : 2;
+                        setStatus(parseInt(studentIdStr), status, buttons[btnIndex]);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error loading attendance:', err);
+        }
+    });
+</script>
 {% endblock %}

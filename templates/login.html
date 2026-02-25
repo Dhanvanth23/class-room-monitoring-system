@@ -1,271 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Login</title>
-   <style>
-       /* Import Google Font: Nunito */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap');
-
-
-/* General styles */
-* {
-   margin: 0;
-   padding: 0;
-   box-sizing: border-box;
-}
-
-
-body {
-   font-family: 'Nunito', Arial, sans-serif;
-   background-color: #0D1321;
-   color: #fff;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   min-height: 100vh;
-   padding: 20px;
-   flex-direction: row; /* Layout: left and right side */
-   overflow: auto;
-}
-
-
-/* Container for login form */
-.login-container {
-   width: 50%;
-   padding: 20px;
-   max-width: 400px;
-}
-
-
-/* Heading styles */
-.login-container h1 {
-   font-size: 2em;
-   margin-bottom: 10px;
-   text-align: left;
-   color: #FFFFFF; /* Kalvi Koodam.ai color */
-}
-
-
-.login-container h2 {
-   font-size: 1.2em;
-   margin-bottom: 20px;
-   text-align: left;
-   color: #C5D86D; /* Subtitle color */
-   font-weight: 600;
-}
-
-
-/* Button group styling */
-.login-container .button-group {
-   display: flex;
-   justify-content: space-between;
-   margin-bottom: 30px;
-}
-
-
-.login-container .button-group button {
-   flex: 1;
-   margin: 0 10px;
-   padding: 20px 0;
-   font-size: 1.1em;
-   display: flex;
-   flex-direction: column;  /* Place icon above text */
-   align-items: center;
-   justify-content: center;
-   border: 1px solid #6200ea;
-   background-color: transparent;
-   color: #6200ea;
-   border-radius: 8px;
-   cursor: pointer;
-   transition: background-color 0.3s, color 0.3s, transform 0.3s;
-}
-
-
-.login-container .button-group button:hover {
-   background-color: #6200ea;
-   color: white;
-   transform: translateY(-3px); /* Hover effect: button lift */
-}
-
-
-.login-container .button-group button i {
-   font-size: 2em; /* Icon size */
-   margin-bottom: 10px; /* Spacing between icon and text */
-}
-
-
-.login-container .button-group button span {
-   font-size: 1.1em;
-   font-weight: 500;
-}
-
-
-/* Form styling */
-.login-container form {
-   display: flex;
-   flex-direction: column;
-}
-
-
-.login-container label {
-   margin: 10px 0 5px;
-   font-weight: 500;
-}
-
-
-.login-container input {
-   padding: 10px;
-   margin-bottom: 15px;
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   font-size: 1em;
-}
-
-
-.login-container button {
-   padding: 12px;
-   margin-bottom: 15px;
-   border: none;
-   border-radius: 5px;
-   background-color: #6200ea;
-   color: white;
-   font-weight: 500;
-   cursor: pointer;
-   transition: background-color 0.3s ease;
-}
-
-
-.login-container button:hover {
-   background-color: #3700b3;
-}
-
-
-.login-container .create-account {
-   text-align: center;
-   margin-top: 10px;
-}
-
-
-.login-container .create-account a {
-   color: #C5D86D; /* Create account link color */
-   text-decoration: none;
-   font-weight: 500;
-   border: 2px solid #C5D86D;
-   padding: 12px 30px;
-   display: inline-block;
-   border-radius: 5px;
-   transition: background-color 0.3s, color 0.3s;
-}
-
-
-.login-container .create-account a:hover {
-   background-color: #C5D86D;
-   color: #0D1321;
-}
-
-
-.error {
-   color: red;
-   text-align: center;
-   margin-top: 10px;
-}
-
-
-.image-container {
-   width: 50%;
-   padding: 20px;
-   text-align: center;
-}
-
-
-.image-container img {
-   max-width: 100%;
-   height: auto;
-   border-radius: 8px;
-}
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-   body {
-       flex-direction: column;
-       align-items: center;
-   }
-
-
-   .login-container {
-       width: 90%;
-       margin-bottom: 20px;
-   }
-
-
-   .image-container {
-       width: 90%;
-   }
-}
-
-
-::selection {
-   background-color: #C5D86D;
-   color: #0D1321;
-}
-
-
-   </style>
-   <!-- Font Awesome for icons -->
+   <title>Login - CMS NEC</title>
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <style>
+      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap');
+
+      * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+      }
+
+      body {
+         font-family: 'Nunito', Arial, sans-serif;
+         background: linear-gradient(135deg, #E8F0FE 0%, #F5F8FF 100%);
+         color: #1a1a2e;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+         padding: 20px;
+      }
+
+      .login-container {
+         background: #ffffff;
+         border: 1px solid #e0e7f1;
+         border-radius: 12px;
+         padding: 50px;
+         width: 100%;
+         max-width: 500px;
+         box-shadow: 0 8px 32px rgba(74, 124, 243, 0.12);
+      }
+
+      .login-container h1 {
+         font-size: 2.4em;
+         margin-bottom: 8px;
+         text-align: center;
+         color: #1a1a2e;
+      }
+
+      .login-container h2 {
+         font-size: 1.1em;
+         margin-bottom: 30px;
+         text-align: center;
+         color: #4A7CF3;
+         font-weight: 600;
+      }
+
+      .form-group {
+         margin-bottom: 20px;
+      }
+
+      .form-group label {
+         display: block;
+         margin-bottom: 8px;
+         font-weight: 500;
+         font-size: 1.1em;
+         color: #333;
+      }
+
+      .form-group input {
+         width: 100%;
+         padding: 12px;
+         border: 1px solid #d0d9e8;
+         border-radius: 6px;
+         background: #f5f8ff;
+         color: #1a1a2e;
+         font-size: 1.1em;
+         transition: border-color 0.3s;
+      }
+
+      .form-group input::placeholder {
+         color: #999;
+      }
+
+      .form-group input:focus {
+         outline: none;
+         border-color: #4A7CF3;
+         background: #eef3ff;
+      }
+
+      .btn {
+         width: 100%;
+         padding: 14px;
+         border: none;
+         border-radius: 6px;
+         font-weight: 600;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         font-size: 1.15em;
+         margin-bottom: 12px;
+      }
+
+      .btn-primary {
+         background: linear-gradient(135deg, #4A7CF3 0%, #3B6DE0 100%);
+         color: white;
+      }
+
+      .btn-primary:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 6px 20px rgba(74, 124, 243, 0.4);
+      }
+
+      .error {
+         color: #ff6b6b;
+         text-align: center;
+         margin-bottom: 20px;
+         padding: 12px;
+         background: rgba(255, 107, 107, 0.1);
+         border-radius: 6px;
+      }
+
+      .forgot-link {
+         text-align: center;
+         margin-top: 16px;
+      }
+
+      .forgot-link a {
+         color: #4A7CF3;
+         text-decoration: none;
+         font-weight: 500;
+         transition: color 0.3s;
+      }
+
+      .forgot-link a:hover {
+         color: #3B6DE0;
+      }
+
+      @media (max-width: 768px) {
+         .login-container {
+            padding: 30px 20px;
+         }
+      }
+   </style>
 </head>
+
 <body>
    <div class="login-container">
-       <h1>Kalvi Koodam.ai</h1>
-       <h2>Your Journey to Smarter Classrooms Begins Here!</h2>
-  
-       <div class="button-group">
-           <!-- Sign in as Admin
-           <examManagementbutton type="button" onclick="location.href='/admin-login'">
-               <i class="fas fa-user-shield"></i>
-               <span>Admin Sign-In</span>
-           </button>
-        Sign in as Institution 
-           <button type="button" onclick="location.href='/institution-login'">
-               <i class="fas fa-building"></i>
-               <span>Institution Sign-In</span>
-           </button>
-       Create Account 
-           <button type="button" onclick="location.href='/create-account'">
-               <i class="fas fa-user-plus"></i>
-               <span>Create Account</span>-->
-           </button>
-       </div>
-       <form method="POST" action="{{ url_for('login') }}">
-           <div>
-               <label for="username">Username</label>
-               <input type="text" id="username" name="username" required>
-           </div>
-           <div>
-               <label for="password">Password</label>
-               <input type="password" id="password" name="password" required>
-           </div>
-           <button type="submit">Login</button>
-       </form>
-      
+      <h1>Kalvi Koodam.ai</h1>
+      <h2>Your Journey to Smarter Classrooms Begins Here!</h2>
 
+      {% if error %}
+      <p class="error">{{ error }}</p>
+      {% endif %}
 
-      
-  
-       <div >
-           <p>Forgot password <a href="/forgot-password">click here</a></p>
-       </div>
-  
-       {% if error %}
-       <p class="error">{{ error }}</p>
-       {% endif %}
+      <form method="POST" action="{{ url_for('login') }}">
+         <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your email" required>
+         </div>
+         <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+         </div>
+         <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+
+      <div class="forgot-link">
+         <p>Forgot password? <a href="/forgot-password">Click here</a></p>
+      </div>
    </div>
-  
-   <div class="image-container">
-       <img src="static/Image.png" alt="Login Image">
-   </div>
-   </body>
+</body>
+
 </html>

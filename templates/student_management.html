@@ -2,40 +2,65 @@
 
 {% block title %}Manage Students{% endblock %}
 
-{% block content %}
-    <section>
-        <h2>Manage Students</h2>
-        <form action="{{ url_for('manage_students') }}" method="POST">
-            <label for="name">Student Name:</label>
-            <input type="text" id="name" name="name" required><br><br>
-            
-            <label for="email">Student Email:</label>
-            <input type="email" id="email" name="email" required><br><br>
-            
-            <button type="submit">Add Student</button>
-        </form>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+{% endblock %}
 
-        <section>
-            <h3>All Students</h3>
-            <table class="students-table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                        <tr>
-                            <td>{{ student.id }}</td>
-                            <td>{{ student.name }}</td>
-                            <td>{{ student.email }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-        
-    </section>
+{% block content %}
+<div class="student-page">
+    <div class="student-banner">
+        <h1><i class="fas fa-user-graduate"></i> Manage Students</h1>
+        <p>Add and view registered students</p>
+    </div>
+
+    <div class="student-grid">
+        <div class="st-card">
+            <div class="card-header">
+                <h2><i class="fas fa-id-card"></i> Student Details</h2>
+            </div>
+            <form class="st-form" action="{{ url_for('manage_students') }}" method="POST">
+                <div class="field">
+                    <label for="name">Student Name</label>
+                    <input type="text" id="name" name="name" placeholder="Full name" required>
+                </div>
+                <div class="field">
+                    <label for="email">Student Email</label>
+                    <input type="email" id="email" name="email" placeholder="email@example.com" required>
+                </div>
+                <div class="field">
+                    <label for="email">Student Rollno</label>
+                    <input type="text" id="Rollno" name="Rollno" placeholder="Rollno" required>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-plus-circle"></i> Add Student
+                </button>
+            </form>
+        </div>
+
+        <div class="st-card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Registered Students</h2>
+            </div>
+            <div class="student-list">
+                {% if students %}
+                {% for student in students %}
+                <div class="student-row">
+                    <div class="st-avatar">{{ student.name[0] }}</div>
+                    <div class="st-info">
+                        <p class="st-name">{{ student.name }}</p>
+                        <p class="st-email">{{ student.email }}</p>
+                        <span class="st-roll">Roll No: {{ student.Rollno }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="st-empty">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No students registered yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

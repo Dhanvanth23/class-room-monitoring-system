@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Sent - CMS NEC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', Arial, sans-serif;
+            background: linear-gradient(135deg, #E8F0FE 0%, #F5F8FF 100%);
+            color: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .verification-container {
+            background: #ffffff;
+            backdrop-filter: blur(10px);
+            border: 1px solid #e0e7f1;
+            border-radius: 12px;
+            padding: 50px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 8px 32px rgba(74, 124, 243, 0.12);
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #51cf66;
+        }
+
+        .verification-container h1 {
+            font-size: 2.4em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #1a1a2e;
+        }
+
+        .verification-container p {
+            text-align: center;
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .email-info {
+            background: rgba(74, 124, 243, 0.08);
+            border-left: 3px solid #4A7CF3;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        .email-info strong {
+            color: #4A7CF3;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .email-address {
+            background: #f5f8ff;
+            padding: 12px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-size: 1.05em;
+        }
+
+        .reset-link-section {
+            background: rgba(81, 207, 102, 0.1);
+            border-left: 3px solid #51cf66;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        .reset-link-section strong {
+            color: #51cf66;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .reset-link {
+            background: #f5f8ff;
+            padding: 12px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #d0d9e8;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.15em;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4A7CF3 0%, #3B6DE0 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 243, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4A7CF3;
+            border: 2px solid #4A7CF3;
+        }
+
+        .btn-secondary:hover {
+            background: #4A7CF3;
+            color: #fff;
+        }
+
+        .btn-copy {
+            background: #4caf50;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.95em;
+            width: auto;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .btn-copy:hover {
+            background: #45a049;
+        }
+
+        .copy-feedback {
+            color: #51cf66;
+            font-size: 0.95em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .copy-feedback.show {
+            display: block;
+        }
+
+        .instructions {
+            background: rgba(255, 159, 64, 0.1);
+            border-left: 3px solid #ff9800;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        .instructions strong {
+            color: #e68900;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            font-size: 1.05em;
+            color: #555;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        .link-expiry {
+            font-size: 0.95em;
+            color: #ff9800;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-login a {
+            color: #4A7CF3;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .back-to-login a:hover {
+            color: #3B6DE0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="verification-container">
+        <div class="success-icon">✓</div>
+        <h1>Verification Email Sent!</h1>
+        <p>We've sent a password reset link to your registered email address.</p>
+
+        <div class="email-info">
+            <strong>Email Address:</strong>
+            <div class="email-address">{{ email }}</div>
+        </div>
+
+        <div class="instructions">
+            <strong>What to do next:</strong>
+            <ol>
+                <li>Check your inbox (and spam folder)</li>
+                <li>Click the reset link in the email</li>
+                <li>Enter your new password</li>
+                <li>Login with your new password</li>
+            </ol>
+        </div>
+
+
+        <div class="link-expiry">
+            <strong>Note:</strong> This reset link expires in 1 hour
+        </div>
+
+        <a href="{{ reset_url }}" class="btn btn-primary"
+            style="text-decoration: none; display: block; text-align: center; padding: 12px;">Click Here to Reset
+            Password</a>
+
+        <a href="{{ url_for('login') }}"><button type="button" class="btn btn-secondary">Back to Login</button></a>
+
+        <div class="back-to-login">
+            <p>Didn't receive an email? <a href="{{ url_for('forgot_password') }}">Try again</a></p>
+        </div>
+    </div>
+
+    <script>
+        function copyLink() {
+            const linkText = document.getElementById('resetLink').textContent;
+            navigator.clipboard.writeText(linkText).then(() => {
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>

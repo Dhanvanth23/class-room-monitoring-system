@@ -20,7 +20,7 @@ class Trainer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
-    expertise = db.Column(db.String(100), nullable=False)
+    trainer_id = db.Column(db.String(50), nullable=False, unique=True)
     sessions = db.relationship('Session', backref='trainer', lazy=True)
 
 # Session model
@@ -39,6 +39,7 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
+    Rollno = db.Column(db.String(50), nullable=False)
 
 # Attendance model (many-to-many relationship between Students and Sessions)
 class Attendance(db.Model):
@@ -46,6 +47,7 @@ class Attendance(db.Model):
     session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
     present = db.Column(db.Boolean, nullable=False)
+    status = db.Column(db.String(10), nullable=False, default='present')
 
     session = db.relationship('Session', backref=db.backref('attendances', lazy=True), overlaps='sessions,students')
     student = db.relationship('Student', backref=db.backref('attendances', lazy=True), overlaps='sessions,students')

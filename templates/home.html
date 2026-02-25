@@ -97,11 +97,7 @@
                     <div class="trainer-details">
                         <p class="trainer-name">{{ trainer.name }}</p>
                         <p class="trainer-email">{{ trainer.email }}</p>
-                        <div class="expertise-tags">
-                            {% for skill in trainer.expertise.split(',') %}
-                            <span class="expertise-tag">{{ skill.strip() }}</span>
-                            {% endfor %}
-                        </div>
+                        <span class="meta-badge" style="font-size:0.72rem;">ID: {{ trainer.trainer_id }}</span>
                     </div>
                 </div>
                 {% endfor %}

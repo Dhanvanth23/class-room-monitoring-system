@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, abort
+import secrets
 from sqlalchemy import func,create_engine
 from flask_socketio import SocketIO, emit
 from datetime import datetime
@@ -60,6 +61,12 @@ output_folder = "./output"
 os.makedirs(PHOTO_UPLOAD_DIR, exist_ok=True)
 os.makedirs("data", exist_ok=True)
 os.makedirs(output_folder, exist_ok=True)
+
+# In-memory store for password reset tokens: { token: email }
+reset_tokens = {}
+
+# Hardcoded credentials (matches existing login logic)
+USERS = {"teacher@gmail.com": "password123"}
 
 @contextmanager
 def session_scope():
@@ -162,17 +169,44 @@ def analyze_photo(photo_path):
 
 # Routes for Classroom Monitoring
 @app.route("/", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """Handle login."""
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        if username == "teacher@gmail.com" and password == "password123":
+        if USERS.get(username) == password:
             session["user"] = username
             return redirect(url_for("main"))
         else:
             return render_template("login.html", error="Invalid credentials")
     return render_template("login.html")
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    """Show forgot-password form; on POST generate reset token."""
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        # Generate token regardless of whether email exists (security best-practice)
+        token = secrets.token_urlsafe(32)
+        reset_tokens[token] = email
+        reset_url = url_for('reset_password', token=token, _external=True)
+        return render_template("email_sent.html", email=email, reset_url=reset_url)
+    return render_template("forgot_password.html")
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    """Validate token and let user set a new password."""
+    email = reset_tokens.get(token)
+    if not email:
+        return render_template("login.html", error="Invalid or expired reset link.")
+    if request.method == "POST":
+        new_password = request.form.get("password", "")
+        if email in USERS:
+            USERS[email] = new_password
+        reset_tokens.pop(token, None)
+        return redirect(url_for("login"))
+    return render_template("reset_password.html", token=token)
 
 @app.route("/home", methods=["GET", "POST"])
 def main():
@@ -195,7 +229,7 @@ def main():
 
         # Get all trainers
         trainers = session.query(Trainer).all()
-        trainers_list = [{"id": t.id, "name": t.name, "email": t.email, "expertise": t.expertise} for t in trainers]
+        trainers_list = [{"id": t.id, "trainer_id": t.trainer_id, "name": t.name, "email": t.email} for t in trainers]
 
 
     return render_template(
@@ -365,13 +399,15 @@ def add_trainer():
         trainer_data = request.form
         with session_scope() as session:
             new_trainer = Trainer(
+                trainer_id=trainer_data['trainer_id'],
                 name=trainer_data['name'],
-                email=trainer_data['email'],
-                expertise=trainer_data['expertise']
+                email=trainer_data['email']
             )
             session.add(new_trainer)
-            return redirect(url_for('main'))
-    return render_template('add_trainer.html')
+            return redirect(url_for('add_trainer'))
+    with session_scope() as session:
+        trainers = session.query(Trainer).all()
+        return render_template('add_trainer.html', trainers=trainers)
 
 @app.route('/students', methods=['GET', 'POST'])
 def manage_students():
@@ -380,7 +416,8 @@ def manage_students():
         with session_scope() as session:
             new_student = Student(
                 name=student_data['name'],
-                email=student_data['email']
+                email=student_data['email'],
+                Rollno=student_data['Rollno']
             )
             session.add(new_student)
     
@@ -390,89 +427,123 @@ def manage_students():
 
 @app.route('/attendance')
 def attendance():
-    # Calculate attendance metrics
-    total_students = Student.query.count()
-    total_sessions = Session.query.count()
-    total_attendance = Attendance.query.filter_by(present=True).count()
+    with session_scope() as sess:
+        total_students = sess.query(Student).count()
+        total_sessions = sess.query(Session).count()
+        total_attendance = sess.query(Attendance).filter_by(present=True).count()
 
-    # Calculate overall attendance percentage
-    overall_attendance = (total_attendance / (total_students * total_sessions)) * 100 if total_sessions > 0 else 0
+        if total_students > 0 and total_sessions > 0:
+            overall_attendance = (total_attendance / (total_students * total_sessions)) * 100
+        else:
+            overall_attendance = 0
 
-    return render_template(
-        'attendance_dashboard.html',
-        total_students=total_students,
-        total_sessions=total_sessions,
-        overall_attendance=round(overall_attendance, 2)
-    )
+        return render_template(
+            'attendance_dashboard.html',
+            total_students=total_students,
+            total_sessions=total_sessions,
+            overall_attendance=round(overall_attendance, 2)
+        )
 
-@app.route('/mark-attendance', methods=['GET', 'POST'])
+@app.route('/mark-attendance', methods=['GET'])
 def mark_attendance():
-    if request.method == 'POST':
-        session_id = request.form['session_id']  # Get session ID from the form
-        student_attendance = request.form.getlist('attendance')  # List of student IDs marked as present
+    with session_scope() as sess:
+        sessions = sess.query(Session).order_by(Session.name, Session.date).all()
+        students = sess.query(Student).all()
+        return render_template('mark_attendance.html', sessions=sessions, students=students)
 
-        # Add attendance records for the selected session
-        for student_id in student_attendance:
-            # Check if the attendance record already exists for the session and student
-            existing_record = Attendance.query.filter_by(session_id=int(session_id), student_id=int(student_id)).first()
-            
-            if not existing_record:
-                # If no existing record, create a new attendance record
-                attendance = Attendance(
-                    session_id=int(session_id),
-                    student_id=int(student_id),
-                    present=True
-                )
-                db.session.add(attendance)
 
-        db.session.commit()
-        return redirect('/attendance-report')
+@app.route('/api/mark-attendance', methods=['POST'])
+def api_mark_attendance():
+    """JSON API endpoint for saving attendance from the mark_attendance page."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
 
-    # Fetch all sessions and students for the form
-    sessions = Session.query.order_by(Session.name, Session.date).all()
-    students = Student.query.all()
+        sid = data.get('session_id')
+        records = data.get('attendance', [])
 
-    return render_template('mark_attendance.html', sessions=sessions, students=students)
+        if not sid:
+            return jsonify({'success': False, 'error': 'session_id is required'}), 400
+
+        with session_scope() as sess:
+            for record in records:
+                student_id = record.get('student_id')
+                status = record.get('status', 'present')
+                is_present = status == 'present'
+
+                existing = sess.query(Attendance).filter_by(
+                    session_id=int(sid), student_id=int(student_id)
+                ).first()
+
+                if existing:
+                    existing.present = is_present
+                    existing.status = status
+                else:
+                    new_att = Attendance(
+                        session_id=int(sid),
+                        student_id=int(student_id),
+                        present=is_present,
+                        status=status
+                    )
+                    sess.add(new_att)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/get-attendance/<int:session_id>', methods=['GET'])
+def api_get_attendance(session_id):
+    """JSON API endpoint for loading saved attendance for a session."""
+    try:
+        with session_scope() as sess:
+            records = sess.query(Attendance).filter_by(session_id=session_id).all()
+            attendance_map = {}
+            for r in records:
+                attendance_map[str(r.student_id)] = r.status if r.status else ('present' if r.present else 'absent')
+
+        return jsonify({'success': True, 'attendance': attendance_map})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/attendance-report', methods=['GET'])
 def attendance_report():
-    # Get all sessions
-    sessions = Session.query.order_by(Session.date).all()
+    with session_scope() as sess:
+        sessions = sess.query(Session).order_by(Session.date).all()
 
-    # Check if a specific session is selected via query parameter
-    session_id = request.args.get('session_id', type=int)
-    selected_session = None
-    attendance_data = []
-
-    if session_id:
-        # Fetch attendance data for the selected session
-        selected_session = db.session.get(Session, session_id)
-        attendance_records = (
-            db.session.query(Attendance, Student)
-            .join(Student, Attendance.student_id == Student.id)
-            .filter(Attendance.session_id == session_id)
-            .all()
-        )
-
-        # Format attendance records for the template
-        attendance_data = [
-            {
-                "student_name": record.Student.name,
-                "present": record.Attendance.present
-            }
-            for record in attendance_records
-        ]
-    else:
+        session_id = request.args.get('session_id', type=int)
         selected_session = None
-        attendance_data = None
+        attendance_data = []
 
-    return render_template(
-        'attendance_report.html',
-        sessions=sessions,
-        selected_session=selected_session,
-        attendance_records=attendance_data
-    )
+        if session_id:
+            selected_session = sess.get(Session, session_id)
+            attendance_records = (
+                sess.query(Attendance, Student)
+                .join(Student, Attendance.student_id == Student.id)
+                .filter(Attendance.session_id == session_id)
+                .all()
+            )
+
+            attendance_data = [
+                {
+                    "student_name": record.Student.name,
+                    "roll_no": record.Student.Rollno,
+                    "status": record.Attendance.status if record.Attendance.status else ('present' if record.Attendance.present else 'absent')
+                }
+                for record in attendance_records
+            ]
+        else:
+            selected_session = None
+            attendance_data = None
+
+        return render_template(
+            'attendance_report.html',
+            sessions=sessions,
+            selected_session=selected_session,
+            attendance_records=attendance_data
+        )
 
 
 
@@ -485,5 +556,14 @@ def examManagement():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        # Migrate: add 'status' column to attendance table if it doesn't exist
+        from sqlalchemy import inspect, text
+        insp = inspect(db.engine)
+        columns = [col['name'] for col in insp.get_columns('attendance')]
+        if 'status' not in columns:
+            with db.engine.connect() as conn:
+                conn.execute(text("ALTER TABLE attendance ADD COLUMN status VARCHAR(10) NOT NULL DEFAULT 'present'"))
+                conn.commit()
+            print("[MIGRATION] Added 'status' column to attendance table.")
     monitor_sessions()
     socketio.run(app, debug=True)
