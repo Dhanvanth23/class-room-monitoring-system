@@ -12,6 +12,10 @@ import cv2
 from database.models import db, Trainer, Session, Student, Attendance, EngagementReport
 from models.FaceAnalyzer import FaceAnalyzer
 from models.engagement import calculate_engagement
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io, base64
 from models.llm import analyze_classroom
 import pandas as pd
 from contextlib import contextmanager
@@ -113,10 +117,14 @@ def load_engagement_scores():
     """Load engagement scores from file."""
     if os.path.exists(ENGAGEMENT_SCORES_FILE):
         with open(ENGAGEMENT_SCORES_FILE, "r") as file:
-            return json.load(file)
+            try:
+                data = json.load(file)
+                return data if isinstance(data, list) else []
+            except json.JSONDecodeError:
+                return []
     return []
 
-def capture_photo(photo_number, max_retries=3):
+def capture_photo(session_id, photo_number, max_retries=3):
     """Capture a photo using the camera and save it to the upload folder."""
     for attempt in range(max_retries):
         cap = cv2.VideoCapture(0)
@@ -139,10 +147,10 @@ def capture_photo(photo_number, max_retries=3):
             time.sleep(2)
             continue
 
-        photo_path = os.path.join(PHOTO_UPLOAD_DIR, f"photo_{photo_number}.jpg")
+        photo_path = os.path.join(PHOTO_UPLOAD_DIR, f"session_{session_id}_photo_{photo_number}.jpg")
         cv2.imwrite(photo_path, frame)
         
-        print(f"Photo {photo_number} captured and saved to {photo_path}")
+        print(f"Photo {photo_number} for session {session_id} captured and saved to {photo_path}")
         return photo_path
     
     raise Exception(f"Failed to capture image after {max_retries} attempts. Check that a camera is connected and not in use by another application.")
@@ -262,13 +270,13 @@ def start_session(session_id):
         minutes = (end - start).seconds // 60
 
         for i in range(minutes):
-            photo_path = capture_photo(i + 1)
+            photo_path = capture_photo(session_id, i + 1)
             face_analyzer = FaceAnalyzer(photo_path)
             num_faces = face_analyzer.analyze_faces()
             
-            face_data_csv = os.path.join(output_folder, f"face_data_{i + 1}.csv")
+            face_data_csv = os.path.join(output_folder, f"session_{session_id}_face_data_{i + 1}.csv")
             face_analyzer.save_results(
-                output_image_path=f"{output_folder}/annotated_image_{i + 1}.jpg",
+                output_image_path=f"{output_folder}/session_{session_id}_annotated_image_{i + 1}.jpg",
                 output_csv_path=face_data_csv
             )
             
@@ -283,7 +291,7 @@ def start_session(session_id):
                 "engagement_score": overall_engagement_score
             })
             
-            if i < 1:
+            if i < minutes - 1:
                 print("Waiting for 1 minute before the next capture...")
                 time.sleep(60)
         
@@ -344,17 +352,44 @@ def view_report(session_id):
         ).filter_by(session_id=session_id).scalar()
 
         # Try loading face data; fall back to empty lists if unavailable
-        face_data_csv = os.path.join(output_folder, f"face_data_1.csv")
+        # We will attempt to load the first photo's data for this report display
+        face_data_csv = os.path.join(output_folder, f"session_{session_id}_face_data_1.csv")
         face_data = []
         engagement_data = []
+        zone_chart_b64 = ''
         if os.path.exists(face_data_csv):
             try:
                 face_data_df = pd.read_csv(face_data_csv)
                 engagement_df, _ = calculate_engagement(face_data_csv)
                 face_data = face_data_df.to_dict(orient='records')
                 engagement_data = engagement_df.to_dict(orient='records')
+
+                # Generate engagement-by-zone doughnut chart image
+                zone_scores = engagement_df.groupby('zone')['engagement_score'].mean()
+                if not zone_scores.empty:
+                    colors = ['#4BC0C0', '#FF9F40', '#36A2EB', '#9966FF']
+                    fig, ax = plt.subplots(figsize=(4, 4))
+                    ax.pie(zone_scores.values, labels=[z.capitalize() for z in zone_scores.index],
+                           autopct='%1.1f%%', colors=colors[:len(zone_scores)],
+                           wedgeprops={'width': 0.4})
+                    ax.set_title('Engagement Score by Zone', fontsize=12, fontweight='bold')
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format='png', bbox_inches='tight', transparent=True)
+                    plt.close(fig)
+                    buf.seek(0)
+                    zone_chart_b64 = base64.b64encode(buf.read()).decode('utf-8')
             except Exception as e:
                 print(f"[WARN] Could not load face data: {e}")
+
+        # Load annotated image
+        annotated_image_path = os.path.join(output_folder, f"session_{session_id}_annotated_image_1.jpg")
+        annotated_image_b64 = ''
+        if os.path.exists(annotated_image_path):
+            try:
+                with open(annotated_image_path, "rb") as img_file:
+                    annotated_image_b64 = base64.b64encode(img_file.read()).decode('utf-8')
+            except Exception as e:
+                print(f"[WARN] Could not load annotated image: {e}")
 
         return render_template(
             'view_report.html',
@@ -363,7 +398,20 @@ def view_report(session_id):
             face_data=face_data,
             engagement_df=engagement_data,
             overall_engagement_score=overall_engagement_score or 0,
+            zone_chart_b64=zone_chart_b64,
+            annotated_image_b64=annotated_image_b64,
         )
+
+@app.route('/delete_report/<int:session_id>', methods=['POST'])
+def delete_report(session_id):
+    with session_scope() as session:
+        session_data = session.get(Session, session_id)
+        if session_data is None:
+            abort(404, description=f"Session with ID {session_id} not found")
+        
+        session.delete(session_data)
+        
+    return redirect(url_for('session_report'))
 
 @app.route("/logout")
 def logout():
@@ -409,6 +457,26 @@ def add_trainer():
         trainers = session.query(Trainer).all()
         return render_template('add_trainer.html', trainers=trainers)
 
+@app.route('/edit_trainer/<int:id>', methods=['GET', 'POST'])
+def edit_trainer(id):
+    with session_scope() as session:
+        trainer = session.query(Trainer).get(id)
+        if request.method == 'POST':
+            trainer.trainer_id = request.form['trainer_id']
+            trainer.name = request.form['name']
+            trainer.email = request.form['email']
+            return redirect(url_for('add_trainer'))
+        trainers = session.query(Trainer).all()
+        return render_template('add_trainer.html', trainers=trainers, edit_trainer=trainer)
+
+@app.route('/delete_trainer/<int:id>', methods=['POST'])
+def delete_trainer(id):
+    with session_scope() as session:
+        trainer = session.query(Trainer).get(id)
+        if trainer:
+            session.delete(trainer)
+    return redirect(url_for('add_trainer'))
+
 @app.route('/students', methods=['GET', 'POST'])
 def manage_students():
     if request.method == 'POST':
@@ -420,10 +488,31 @@ def manage_students():
                 Rollno=student_data['Rollno']
             )
             session.add(new_student)
+            return redirect(url_for('manage_students'))
     
     with session_scope() as session:
         students = session.query(Student).all()
         return render_template('student_management.html', students=students)
+
+@app.route('/edit_student/<int:id>', methods=['GET', 'POST'])
+def edit_student(id):
+    with session_scope() as session:
+        student = session.query(Student).get(id)
+        if request.method == 'POST':
+            student.name = request.form['name']
+            student.email = request.form['email']
+            student.Rollno = request.form['Rollno']
+            return redirect(url_for('manage_students'))
+        students = session.query(Student).all()
+        return render_template('student_management.html', students=students, edit_student=student)
+
+@app.route('/delete_student/<int:id>', methods=['POST'])
+def delete_student(id):
+    with session_scope() as session:
+        student = session.query(Student).get(id)
+        if student:
+            session.delete(student)
+    return redirect(url_for('manage_students'))
 
 @app.route('/attendance')
 def attendance():

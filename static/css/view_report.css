@@ -1,0 +1,253 @@
+/* ==============================================
+   VIEW REPORT PAGE
+   ============================================== */
+
+/* ---------- Page Container ---------- */
+.view-report-page {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    padding: 2rem;
+    min-height: calc(100vh - 70px);
+    background-color: var(--home-bg, #f0f4f8);
+    position: relative;
+    /* subtle education-themed dot grid overlay */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%231e40af' opacity='0.035'%3E%3C!-- Book --%3E%3Crect x='8' y='10' width='14' height='18' rx='1.5' /%3E%3Cline x1='15' y1='10' x2='15' y2='28' stroke='%23f0f4f8' stroke-width='1'/%3E%3C!-- Graduation cap --%3E%3Cpolygon points='50,12 40,18 50,24 60,18' /%3E%3Crect x='48.5' y='18' width='3' height='8' rx='0.5' /%3E%3C!-- Atom/molecule --%3E%3Ccircle cx='18' cy='58' r='3' /%3E%3Cellipse cx='18' cy='58' rx='9' ry='4' fill='none' stroke='%231e40af' stroke-width='1' transform='rotate(30 18 58)' /%3E%3Cellipse cx='18' cy='58' rx='9' ry='4' fill='none' stroke='%231e40af' stroke-width='1' transform='rotate(-30 18 58)' /%3E%3C!-- Pencil --%3E%3Crect x='56' y='48' width='4' height='18' rx='0.5' transform='rotate(-20 58 57)' /%3E%3Cpolygon points='54,66 58,70 62,66' transform='rotate(-20 58 68)' /%3E%3C/g%3E%3C/svg%3E");
+    background-size: 120px 120px;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--home-blue-100, #dbeafe);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--home-text, #1e293b);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-title i {
+    color: var(--home-blue-500, #3b82f6);
+}
+
+.page-subtitle {
+    color: var(--home-text-muted, #64748b);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* ---------- Grid Layouts ---------- */
+.top-dashboard-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.bottom-dashboard-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* ---------- Cards ---------- */
+.report-card {
+    background: var(--home-card-bg, #ffffff);
+    border-radius: var(--home-radius, 16px);
+    box-shadow: var(--home-shadow, 0 1px 3px rgba(30, 58, 95, 0.06), 0 4px 14px rgba(30, 58, 95, 0.08));
+    padding: 1.5rem 2rem;
+    transition: var(--home-transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.report-card:hover {
+    box-shadow: var(--home-shadow-hover, 0 4px 12px rgba(30, 58, 95, 0.10), 0 8px 24px rgba(30, 58, 95, 0.12));
+}
+
+.report-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--home-text, #1e293b);
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--home-blue-50, #eff6ff);
+    padding-bottom: 0.75rem;
+}
+
+.report-card h2 i {
+    color: var(--home-blue-500, #3b82f6);
+}
+
+/* ---------- Session Details ---------- */
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed var(--home-blue-100, #dbeafe);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--home-text-muted, #64748b);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.detail-value {
+    color: var(--home-text, #1e293b);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ---------- Overall Engagement Score ---------- */
+.engagement-score-display {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.overall-engagement-score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.score-legend {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--home-blue-50, #eff6ff);
+}
+
+.score-legend p {
+    font-weight: 600;
+    color: var(--home-text-muted, #64748b);
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.score-legend ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.score-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--home-text-muted, #64748b);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-dot.excellent {
+    background-color: #4caf50;
+}
+
+.legend-dot.good {
+    background-color: #8bc34a;
+}
+
+.legend-dot.average {
+    background-color: #ffeb3b;
+}
+
+.legend-dot.bad {
+    background-color: #ff9800;
+}
+
+.legend-dot.extremely-bad {
+    background-color: #f44336;
+}
+
+/* ---------- Charts and Images ---------- */
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.small-chart {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.engzone-description,
+.emotion-description {
+    font-size: 0.9rem;
+    color: var(--home-text-muted, #64748b);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* ---------- Data Tables ---------- */
+.data-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--home-blue-100, #dbeafe);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.data-table th {
+    background-color: var(--home-blue-50, #eff6ff);
+    color: var(--home-blue-800, #1e40af);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--home-blue-100, #dbeafe);
+}
+
+.data-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--home-text, #1e293b);
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 992px) {
+
+    .top-dashboard-row,
+    .bottom-dashboard-row {
+        grid-template-columns: 1fr;
+    }
+}

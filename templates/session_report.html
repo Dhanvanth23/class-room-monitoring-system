@@ -1,27 +1,81 @@
-{% extends "dashboard.html" %} {% block title %}Session Reports{% endblock %} {%
-block content %}
-<div class="session-reports-container">
-  <h2 class="page-title">Session Reports</h2>
+{% extends "dashboard.html" %}
+{% block title %}Session Reports{% endblock %}
 
-  <div class="session-cards">
-    {% for session in sessions %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/session_report.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+{% endblock %}
+
+{% block content %}
+<div class="session-reports-page">
+  <div class="page-header">
+    <h1 class="page-title"><i class="fa-solid fa-chart-pie"></i> Session Reports</h1>
+    <p class="page-subtitle">View detailed engagement and attendance analysis for past classroom sessions.</p>
+  </div>
+
+  <div class="session-stack">
+    {% set ns = namespace(found=false) %}
+
+    {% for session in sessions|reverse %}
+    {% set ns.found = true %}
     <div class="session-card">
-      <div class="card-body">
-        <h3 class="session-title">{{ session.name }}</h3>
-        <p class="session-details">
-          <strong>Trainer:</strong> {{ session.trainer.name }}<br />
-          <strong>Date:</strong> {{ session.date }}<br />
-          <strong>Start Time:</strong> {{ session.start_time }}<br />
-          <strong>End Time:</strong> {{ session.end_time }}<br />
-        </p>
-        <a
-          href="{{ url_for('view_report', session_id=session.id) }}"
-          class="btn-view-report"
-          >View Report</a
-        >
+      <div class="session-card-accent"></div>
+
+      <!-- Date Time Block -->
+      <div class="session-datetime">
+        <div class="session-date-info">
+          {% set date_str = session.date|string %}
+          {% if date_str|length >= 10 %}
+          {# Assuming YYYY-MM-DD format based on standard string conversion #}
+          {% set year = date_str[0:4] %}
+          {% set month_num = date_str[5:7] %}
+          {% set day = date_str[8:10] %}
+          {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+          {% set month_name = months[(month_num|int) - 1] %}
+          <div class="session-month-year">{{ month_name }} {{ year }}</div>
+          <div class="session-date">{{ day }}</div>
+          {% else %}
+          <div class="session-month-year">Unknown</div>
+          <div class="session-date">--</div>
+          {% endif %}
+        </div>
+        <div class="session-time-block">
+          <i class="fa-regular fa-clock"></i>
+          {{ session.start_time if session.start_time else '--:--' }} -
+          {{ session.end_time if session.end_time else '--:--' }}
+        </div>
+      </div>
+
+      <!-- Main Info Block -->
+      <div class="session-main-content">
+        <div class="session-info">
+          <h2 class="session-title">{{ session.name }}</h2>
+          <div class="session-details-row">
+            <div class="session-trainer">
+              <i class="fa-solid fa-user-tie"></i>
+              {{ session.trainer.name if session.trainer else 'Unassigned' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="session-actions">
+          <a href="{{ url_for('view_report', session_id=session.id) }}" class="btn-view-report">
+            View Analytics <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
       </div>
     </div>
     {% endfor %}
+
+    {% if not ns.found %}
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fa-regular fa-folder-open"></i>
+      </div>
+      <h3>No Session Reports Available</h3>
+      <p>There are no completed sessions to display reports for.</p>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -1,104 +1,152 @@
-{% extends "dashboard.html" %} {% block title %}View Report{% endblock %} {%
-block content %}
-<div class="view-report">
-  <main class="view-report-container">
-    <!-- Session Details div -->
-    <section class="session-details">
-      <h2>Session Details</h2>
-      <p><strong>Session Name:</strong> {{ session.name }}</p>
-      <p><strong>Date:</strong> {{ session.date }}</p>
-      <p><strong>Start Time:</strong> {{ session.start_time }}</p>
-      <p><strong>End Time:</strong> {{ session.end_time }}</p>
-      <p><strong>Trainer ID:</strong> {{ session.trainer_id }}</p>
-    </section>
+{% extends "dashboard.html" %}
+{% block title %}View Report{% endblock %}
 
-    <!-- Overall Engagement div -->
-    <div class="engagement-score">
-      <h2>Overall Engagement Score</h2>
-      <p>
-        <span class="overall-engagement-score"
-          >{{ overall_engagement_score | float | round(2) }} %</span
-        >
-      </p>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view_report.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+{% endblock %}
 
-      <!-- Engagement Score Legend -->
-      <div class="score-legend">
-        <p><strong>Legend:</strong></p>
-        <ul>
-          <li><span class="excellent"></span> Excellent: 90 - 100</li>
-          <li><span class="good"></span> Good: 70 - 89</li>
-          <li><span class="average"></span> Average: 50 - 69</li>
-          <li><span class="bad"></span> Bad: 30 - 49</li>
-          <li><span class="extremely-bad"></span> Extremely Bad: 0 - 29</li>
-        </ul>
-      </div>
+{% block content %}
+<div class="view-report-page">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div>
+      <h1 class="page-title"><i class="fa-solid fa-chart-line"></i> Session Analytics</h1>
+      <p class="page-subtitle">Detailed engagement and face analysis report for the session.</p>
     </div>
+    <form action="{{ url_for('delete_report', session_id=session.id) }}" method="POST"
+      onsubmit="return confirm('Are you sure you want to delete this report? This action cannot be undone.');">
+      <button type="submit"
+        style="background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: background-color 0.2s ease;">
+        <i class="fa-solid fa-trash"></i> Delete Report
+      </button>
+    </form>
+  </div>
 
-    <!-- Accessibility Report div -->
-    <div class="accessibility-report">
-      <h2>Generated Report</h2>
-      <p>{{ engagement_report.report_content }}</p>
-    </div>
+  <main class="view-report-content">
 
-    <!-- Description for Overall Engagement Score -->
-    <div class="engagement-analysis">
-      <!-- Engagement Score by Zone Chart -->
-      <h2>Engagement Score by Zone</h2>
-      <canvas id="engagementByZoneChart" class="small-chart"></canvas>
-      <p class="engzone-description">
-        The chart shows the distribution of engagement detected in the audience
-        faces in different zones in classroom.
-      </p>
+    <!-- Top Row: Session Details & Overall Engagement -->
+    <div class="top-dashboard-row">
+      <!-- Session Details Card -->
+      <section class="report-card session-details">
+        <h2><i class="fa-solid fa-circle-info"></i> Session Details</h2>
+        <div class="detail-item">
+          <span class="detail-label">Session Name</span>
+          <span class="detail-value">{{ session.name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">{{ session.date }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">{{ session.start_time }} - {{ session.end_time }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Trainer ID</span>
+          <span class="detail-value">{{ session.trainer_id }}</span>
+        </div>
+      </section>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Zone</th>
-            <th>Engagement Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in engagement_df %}
-          <tr>
-            <td>{{ row.zone }}</td>
-            <td>{{ row.engagement_score }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+      <!-- Overall Engagement Card -->
+      <section class="report-card engagement-score">
+        <h2><i class="fa-solid fa-ranking-star"></i> Overall Engagement Score</h2>
+        <div class="engagement-score-display">
+          <span class="overall-engagement-score">{{ overall_engagement_score | float | round(2) }} %</span>
+        </div>
 
-    <!-- Face Analysis div with Data and Emotion Distribution -->
-    <div class="face-analysis">
-      <h2>Face Analysis Data</h2>
+        <!-- Engagement Score Legend -->
+        <div class="score-legend">
+          <p>Legend</p>
+          <ul>
+            <li><span class="legend-dot excellent"></span> 90-100 (Excellent)</li>
+            <li><span class="legend-dot good"></span> 70-89 (Good)</li>
+            <li><span class="legend-dot average"></span> 50-69 (Avg)</li>
+            <li><span class="legend-dot bad"></span> 30-49 (Bad)</li>
+            <li><span class="legend-dot extremely-bad"></span> 0-29 (Poor)</li>
+          </ul>
+        </div>
+      </section>
+    </div> <!-- End Top Row -->
 
-      <!-- Pie chart for Emotion Distribution -->
-      <canvas id="emotionDistributionChart" class="small-chart"></canvas>
+    <!-- Bottom Row: Engagement by Zone & Face Analysis Data -->
+    <div class="bottom-dashboard-row">
 
-      <p class="emotion-description">
-        The chart shows the distribution of emotions detected in the audience
-        faces during the session.
-      </p>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Face ID</th>
-            <th>Emotion</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for face in face_data %}
-          <tr>
-            <td>{{ face.face_id }}</td>
-            <td>{{ face.emotion }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+      <!-- Engagement Score by Zone Card -->
+      <section class="report-card engagement-analysis">
+        <h2><i class="fa-solid fa-location-dot"></i> Engagement by Zone</h2>
 
-    
+        <div class="chart-container">
+          {% if zone_chart_b64 %}
+          <img src="data:image/png;base64,{{ zone_chart_b64 }}" alt="Engagement by Zone" class="small-chart">
+          {% else %}
+          <p>No chart data available.</p>
+          {% endif %}
+        </div>
+
+        <p class="engzone-description">
+          Distribution of engagement detected across different classroom zones.
+        </p>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Zone</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in engagement_df %}
+              <tr>
+                <td style="text-transform: capitalize;">{{ row.zone }}</td>
+                <td>{{ row.engagement_score | float | round(1) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Face Analysis Data Card -->
+      <section class="report-card face-analysis">
+        <h2><i class="fa-solid fa-users-viewfinder"></i> Face Analysis Data</h2>
+
+        <div class="chart-container">
+          <!-- Annotated Output Image -->
+          {% if annotated_image_b64 %}
+          <img src="data:image/jpeg;base64,{{ annotated_image_b64 }}" alt="Annotated Image" class="small-chart">
+          {% else %}
+          <p>No annotated image available.</p>
+          {% endif %}
+        </div>
+
+        <p class="emotion-description">
+          Detected emotions in audience faces during the session.
+        </p>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Face ID</th>
+                <th>Emotion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for face in face_data %}
+              <tr>
+                <td>{{ face.face_id }}</td>
+                <td style="text-transform: capitalize;">{{ face.emotion }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div> <!-- End Bottom Row -->
+
   </main>
 </div>
 
@@ -123,98 +171,4 @@ block content %}
     scoreElement.style.color = "#f44336"; // Extremely Bad (red)
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Create Overall Engagement Score Chart (Bar Chart for Zone)
-  var ctx = document.getElementById('engagementByZoneChart').getContext('2d');
-  var engagementByZoneChart = new Chart(ctx, {
-      type: 'doughnut', // Change to doughnut chart
-      data: {
-          labels: ['Center', 'Left', 'Right', 'Other'], // You can dynamically adjust the zones
-          datasets: [{
-              label: 'Engagement Score by Zone',
-              data: [
-                  {% for zone in ['center', 'left', 'right', 'other'] %}
-                      {% set zone_score = engagement_df | selectattr('zone', 'equalto', zone) | map(attribute='engagement_score') | sum %}
-                      {{ zone_score }},
-                  {% endfor %}
-              ],
-              backgroundColor: [
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(255, 159, 64, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(153, 102, 255, 0.2)'
-              ],
-              borderColor: [
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(255, 159, 64, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(153, 102, 255, 1)'
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-          responsive: true,
-          plugins: {
-              legend: {
-                  position: 'top',
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(tooltipItem) {
-                          return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2); // Display engagement score in tooltip
-                      }
-                  }
-              }
-          },
-          scales: {
-              y: {
-                  display: false, // Doughnut chart doesn't need y-axis
-              },
-              x: {
-                  display: false, // Doughnut chart doesn't need x-axis
-              }
-          }
-      }
-  });
-
-
-  // Create Emotion Distribution Pie Chart
-  var emotionCtx = document.getElementById('emotionDistributionChart').getContext('2d');
-  var emotionDistributionChart = new Chart(emotionCtx, {
-      type: 'pie',
-      data: {
-          labels: ['Neutral', 'Happy', 'Sad', 'Surprised', 'Angry', 'Fear'],
-          datasets: [{
-              label: 'Emotion Distribution',
-              data: [{% for face in face_data %} {% if face.emotion == 'neutral' %} 1 {% endif %} {% endfor %},
-                     {% for face in face_data %} {% if face.emotion == 'happy' %} 1 {% endif %} {% endfor %},
-                     {% for face in face_data %} {% if face.emotion == 'sad' %} 1 {% endif %} {% endfor %},
-                     {% for face in face_data %} {% if face.emotion == 'surprised' %} 1 {% endif %} {% endfor %},
-                     {% for face in face_data %} {% if face.emotion == 'angry' %} 1 {% endif %} {% endfor %}
-                     {% for face in face_data %} {% if face.emotion == 'fear' %} 1 {% endif %} {% endfor %}],
-              backgroundColor: [
-                  'rgba(255, 159, 64, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(153, 102, 255, 0.2)'
-              ],
-              borderColor: [
-                  'rgba(255, 159, 64, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(153, 102, 255, 1)'
-              ],
-              borderWidth: 1
-          }]
-      },
-      options: {
-          responsive: true,
-      }
-  });
-</script>
-
 {% endblock %}

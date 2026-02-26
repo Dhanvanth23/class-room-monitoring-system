@@ -1,0 +1,274 @@
+/* ==============================================
+   SESSION REPORTS PAGE
+   ============================================== */
+
+/* ---------- Page Container ---------- */
+.session-reports-page {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    padding: 2rem;
+    min-height: calc(100vh - 70px);
+    background-color: var(--home-bg, #f0f4f8);
+    position: relative;
+    /* subtle education-themed dot grid overlay */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%231e40af' opacity='0.035'%3E%3C!-- Book --%3E%3Crect x='8' y='10' width='14' height='18' rx='1.5' /%3E%3Cline x1='15' y1='10' x2='15' y2='28' stroke='%23f0f4f8' stroke-width='1'/%3E%3C!-- Graduation cap --%3E%3Cpolygon points='50,12 40,18 50,24 60,18' /%3E%3Crect x='48.5' y='18' width='3' height='8' rx='0.5' /%3E%3C!-- Atom/molecule --%3E%3Ccircle cx='18' cy='58' r='3' /%3E%3Cellipse cx='18' cy='58' rx='9' ry='4' fill='none' stroke='%231e40af' stroke-width='1' transform='rotate(30 18 58)' /%3E%3Cellipse cx='18' cy='58' rx='9' ry='4' fill='none' stroke='%231e40af' stroke-width='1' transform='rotate(-30 18 58)' /%3E%3C!-- Pencil --%3E%3Crect x='56' y='48' width='4' height='18' rx='0.5' transform='rotate(-20 58 57)' /%3E%3Cpolygon points='54,66 58,70 62,66' transform='rotate(-20 58 68)' /%3E%3C/g%3E%3C/svg%3E");
+    background-size: 120px 120px;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--home-blue-100, #dbeafe);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--home-text, #1e293b);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-title i {
+    color: var(--home-blue-500, #3b82f6);
+}
+
+.page-subtitle {
+    color: var(--home-text-muted, #64748b);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* ---------- Session Stack ---------- */
+.session-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    margin: 0;
+}
+
+/* ---------- Session Card ---------- */
+.session-card {
+    background: var(--home-card-bg, #ffffff);
+    border-radius: var(--home-radius, 12px);
+    box-shadow: var(--home-shadow, 0 1px 3px rgba(30, 58, 95, 0.06));
+    transition: var(--home-transition, all 0.3s ease);
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.session-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--home-shadow-hover, 0 4px 12px rgba(30, 58, 95, 0.10));
+    border-color: var(--home-blue-300, #93c5fd);
+}
+
+/* Accent block on the left */
+.session-card-accent {
+    width: 4px;
+    background: linear-gradient(to bottom, var(--home-blue-400, #60a5fa), var(--home-blue-600, #2563eb));
+    flex-shrink: 0;
+}
+
+/* Left part: Date and Time Block */
+.session-datetime {
+    padding: 1rem 1.5rem;
+    background-color: var(--home-blue-50, #eff6ff);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 180px;
+    border-right: 1px solid rgba(226, 232, 240, 0.8);
+    text-align: center;
+}
+
+.session-date-info {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.session-date {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--home-blue-800, #1e40af);
+}
+
+.session-month-year {
+    font-size: 0.95rem;
+    color: var(--home-blue-600, #2563eb);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.session-time-block {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--home-text-muted, #64748b);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--home-blue-200, #bfdbfe);
+    width: 100%;
+    justify-content: center;
+}
+
+.session-time-block i {
+    color: var(--home-blue-500, #3b82f6);
+}
+
+/* Middle part: Main details */
+.session-main-content {
+    padding: 1rem 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.session-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.session-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--home-text, #1e293b);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-details-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.session-trainer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--home-text-muted, #64748b);
+    font-weight: 500;
+}
+
+.session-trainer i {
+    color: var(--home-blue-400, #60a5fa);
+    font-size: 1.1rem;
+}
+
+/* Action button area */
+.session-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.btn-view-report {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--home-blue-600, #2563eb);
+    color: white;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.btn-view-report:hover {
+    background: var(--home-blue-700, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+.btn-view-report i {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-view-report:hover i {
+    transform: translateX(3px);
+}
+
+/* ---------- Empty State ---------- */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--home-card-bg, #ffffff);
+    border-radius: var(--home-radius, 16px);
+    box-shadow: var(--home-shadow, 0 1px 3px rgba(30, 58, 95, 0.06), 0 4px 14px rgba(30, 58, 95, 0.08));
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--home-blue-200, #bfdbfe);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-size: 1.4rem;
+    color: var(--home-text, #1e293b);
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+    color: var(--home-text-muted, #64748b);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .session-card {
+        flex-direction: column;
+    }
+
+    .session-datetime {
+        border-right: none;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        flex-direction: row;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        justify-content: space-between;
+    }
+
+    .session-date-info {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+
+    .session-time-block {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .session-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

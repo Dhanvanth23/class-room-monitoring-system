@@ -21,7 +21,7 @@ class Trainer(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     trainer_id = db.Column(db.String(50), nullable=False, unique=True)
-    sessions = db.relationship('Session', backref='trainer', lazy=True)
+    sessions = db.relationship('Session', backref='trainer', lazy=True, cascade="all, delete-orphan")
 
 # Session model
 class Session(db.Model):
@@ -32,7 +32,7 @@ class Session(db.Model):
     end_time = db.Column(db.String(5), nullable=False)
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer.id'), nullable=False)
     students = db.relationship('Student', secondary='attendance', backref='sessions', lazy='dynamic', overlaps='attendances,session,student')
-    engagement_reports = db.relationship('EngagementReport', back_populates='session')
+    engagement_reports = db.relationship('EngagementReport', back_populates='session', cascade="all, delete-orphan")
 
 # Student model
 class Student(db.Model):
@@ -49,8 +49,8 @@ class Attendance(db.Model):
     present = db.Column(db.Boolean, nullable=False)
     status = db.Column(db.String(10), nullable=False, default='present')
 
-    session = db.relationship('Session', backref=db.backref('attendances', lazy=True), overlaps='sessions,students')
-    student = db.relationship('Student', backref=db.backref('attendances', lazy=True), overlaps='sessions,students')
+    session = db.relationship('Session', backref=db.backref('attendances', lazy=True, cascade="all, delete-orphan"), overlaps='sessions,students')
+    student = db.relationship('Student', backref=db.backref('attendances', lazy=True, cascade="all, delete-orphan"), overlaps='sessions,students')
 
 
 class EngagementReport(db.Model):
